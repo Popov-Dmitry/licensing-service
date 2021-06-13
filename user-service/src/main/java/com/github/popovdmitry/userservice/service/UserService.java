@@ -1,5 +1,6 @@
-package com.github.popovdmitry.userservice.model;
+package com.github.popovdmitry.userservice.service;
 
+import com.github.popovdmitry.userservice.model.User;
 import com.github.popovdmitry.userservice.repository.UserRepository;
 import javassist.NotFoundException;
 import lombok.RequiredArgsConstructor;
@@ -27,19 +28,21 @@ public class UserService {
         throw new NotFoundException(String.format("User with id %d is not found", id));
     }
 
-    public void updateUser(User user) throws NotFoundException {
-        if (userRepository.findById(user.getId()).isPresent()) {
+    public void updateUser(Long id, User user) throws NotFoundException {
+        Optional<User> originalUser = userRepository.findById(id);
+        if (originalUser.isPresent()) {
+            user.setId(originalUser.get().getId());
             userRepository.save(user);
             return;
         }
         throw new NotFoundException(String.format("User with id %d is not found", user.getId()));
     }
 
-    public void deleteUser(User user) throws NotFoundException {
-        if (userRepository.findById(user.getId()).isPresent()) {
-            userRepository.delete(user);
+    public void deleteUser(Long id) throws NotFoundException {
+        if (userRepository.findById(id).isPresent()) {
+            userRepository.deleteById(id);
             return;
         }
-        throw new NotFoundException(String.format("User with id %d is not found", user.getId()));
+        throw new NotFoundException(String.format("User with id %d is not found", id));
     }
 }

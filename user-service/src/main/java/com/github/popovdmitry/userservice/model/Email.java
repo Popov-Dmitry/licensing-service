@@ -15,6 +15,7 @@ import javax.persistence.*;
 public class Email {
 
     @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
     @Column(name = "email")
@@ -25,4 +26,7 @@ public class Email {
     @JsonBackReference
     private User user;
 
+    public Email(String email) {
+        this.email = email;
+    }
 }
