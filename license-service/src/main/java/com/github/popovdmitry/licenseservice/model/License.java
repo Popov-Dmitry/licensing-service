@@ -28,6 +28,10 @@ public class License {
     @Column(name = "user_id")
     private Long userId;
 
+    @ManyToOne
+    @JoinColumn(name = "product_id")
+    private Product product;
+
     @Column(name = "keys")
     private KeyPair keyPair;
 }
