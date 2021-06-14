@@ -66,7 +66,7 @@ public class LicenseService {
                         licenseDTO
                                 .getUserId()
                 ).stream()
-                .map(License::getUserId)
+                .map(License::getId)
                 .toList();
     }
 
@@ -80,7 +80,7 @@ public class LicenseService {
             Cipher cipher = Cipher.getInstance("RSA");
             cipher.init(Cipher.DECRYPT_MODE, license.getKeyPair().getPrivate());
 
-            byte[] bytes = cipher.doFinal(verifiableLicense.getPublicKey().getBytes());
+            byte[] bytes = cipher.doFinal(verifiableLicense.getPublicKey().toByteArray());
             ByteBuffer byteBuffer = ByteBuffer.allocate(Long.BYTES);
             byteBuffer.put(bytes);
             byteBuffer.flip();

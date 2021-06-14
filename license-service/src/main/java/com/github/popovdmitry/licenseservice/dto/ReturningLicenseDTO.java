@@ -9,9 +9,11 @@ import javax.crypto.BadPaddingException;
 import javax.crypto.Cipher;
 import javax.crypto.IllegalBlockSizeException;
 import javax.crypto.NoSuchPaddingException;
+import java.math.BigInteger;
 import java.nio.ByteBuffer;
 import java.security.InvalidKeyException;
 import java.security.NoSuchAlgorithmException;
+import java.util.Arrays;
 
 @Data
 @AllArgsConstructor
@@ -23,7 +25,7 @@ public class ReturningLicenseDTO {
     private String endDate;
     private Long userId;
     private String productName;
-    private String publicKey;
+    private BigInteger publicKey;
 
     public static ReturningLicenseDTO fromLicense(License license) throws NoSuchPaddingException, NoSuchAlgorithmException, InvalidKeyException, IllegalBlockSizeException, BadPaddingException {
         Cipher cipher = Cipher.getInstance("RSA");
@@ -31,7 +33,7 @@ public class ReturningLicenseDTO {
         ByteBuffer byteBuffer = ByteBuffer.allocate(Long.BYTES);
         byteBuffer.putLong(license.getUserId());
         byte[] bytes = cipher.doFinal(byteBuffer.array());
-        String publicKey = new String(bytes);
+        BigInteger publicKey = new BigInteger(bytes);
 
         return new ReturningLicenseDTO(license.getId(),
                 license.getStartDate().toString(),
