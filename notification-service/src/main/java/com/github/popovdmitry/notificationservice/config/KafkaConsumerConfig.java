@@ -1,7 +1,5 @@
 package com.github.popovdmitry.notificationservice.config;
 
-import com.fasterxml.jackson.databind.JavaType;
-import com.fasterxml.jackson.databind.ObjectMapper;
 import com.github.popovdmitry.notificationservice.dto.LicenseInfoDTO;
 import com.github.popovdmitry.notificationservice.dto.UserInfoDTO;
 import org.apache.kafka.clients.consumer.ConsumerConfig;
@@ -14,41 +12,36 @@ import org.springframework.kafka.core.DefaultKafkaConsumerFactory;
 import org.springframework.kafka.support.serializer.JsonDeserializer;
 
 import java.util.HashMap;
-import java.util.List;
 import java.util.Map;
 
 @Configuration
 public class KafkaConsumerConfig {
     @Bean
-    public ConsumerFactory<String, List<LicenseInfoDTO>> consumerFactoryLicense(){
+    public ConsumerFactory<String, LicenseInfoDTO> consumerFactoryLicense(){
         Map<String,Object> config = new HashMap<>();
         config.put(ConsumerConfig.BOOTSTRAP_SERVERS_CONFIG,"localhost:9092");
-        config.put(ConsumerConfig.GROUP_ID_CONFIG,"licenses");
-        ObjectMapper om = new ObjectMapper();
-        JavaType type = om.getTypeFactory().constructParametricType(List.class, LicenseInfoDTO.class);
-        return new DefaultKafkaConsumerFactory<>(config,new StringDeserializer(), new JsonDeserializer<List<LicenseInfoDTO>>(type, om, false));
+        config.put(ConsumerConfig.GROUP_ID_CONFIG,"licensesInfo");
+        return new DefaultKafkaConsumerFactory<>(config, new StringDeserializer(), new JsonDeserializer<LicenseInfoDTO>(LicenseInfoDTO.class, false));
     }
 
     @Bean
-    public ConsumerFactory<String, List<UserInfoDTO>> consumerFactoryUser(){
+    public ConsumerFactory<String, UserInfoDTO> consumerFactoryUser(){
         Map<String,Object> config = new HashMap<>();
         config.put(ConsumerConfig.BOOTSTRAP_SERVERS_CONFIG,"localhost:9092");
-        config.put(ConsumerConfig.GROUP_ID_CONFIG,"users");
-        ObjectMapper om = new ObjectMapper();
-        JavaType type = om.getTypeFactory().constructParametricType(List.class, UserInfoDTO.class);
-        return new DefaultKafkaConsumerFactory<>(config,new StringDeserializer(), new JsonDeserializer<List<UserInfoDTO>>(type, om, false));
+        config.put(ConsumerConfig.GROUP_ID_CONFIG,"usersInfo");
+        return new DefaultKafkaConsumerFactory<>(config,new StringDeserializer(), new JsonDeserializer<UserInfoDTO>(UserInfoDTO.class, false));
     }
 
-    @Bean(name = "licenseListener")
-    public ConcurrentKafkaListenerContainerFactory<String, List<LicenseInfoDTO>> licenseListener(){
-        ConcurrentKafkaListenerContainerFactory<String, List<LicenseInfoDTO>> factory = new ConcurrentKafkaListenerContainerFactory<>();
+    @Bean(name = "licenseInfoListener")
+    public ConcurrentKafkaListenerContainerFactory<String, LicenseInfoDTO> licenseInfoListener(){
+        ConcurrentKafkaListenerContainerFactory<String, LicenseInfoDTO> factory = new ConcurrentKafkaListenerContainerFactory<>();
         factory.setConsumerFactory(consumerFactoryLicense());
         return factory;
     }
 
-    @Bean(name = "userListener")
-    public ConcurrentKafkaListenerContainerFactory<String, List<UserInfoDTO>> userListener(){
-        ConcurrentKafkaListenerContainerFactory<String, List<UserInfoDTO>> factory = new ConcurrentKafkaListenerContainerFactory<>();
+    @Bean(name = "userInfoListener")
+    public ConcurrentKafkaListenerContainerFactory<String, UserInfoDTO> userInfoListener(){
+        ConcurrentKafkaListenerContainerFactory<String, UserInfoDTO> factory = new ConcurrentKafkaListenerContainerFactory<>();
         factory.setConsumerFactory(consumerFactoryUser());
         return factory;
     }
