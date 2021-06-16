@@ -10,5 +10,5 @@ import java.util.List;
 @Repository
 public interface LicenseRepository extends JpaRepository<License, Long> {
     List<License> findAllByUserId(Long userId);
-    List<License> findAllByEndDateAfter(Date date);
+    List<License> findAllByEndDateBefore(Date date);
 }

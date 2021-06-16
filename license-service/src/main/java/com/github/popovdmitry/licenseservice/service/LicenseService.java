@@ -103,9 +103,10 @@ public class LicenseService {
     }
 
 
-    @Scheduled(cron = "0 0 2 * * ?")
+    @Scheduled(cron = "0 46 17 * * ?")
     private void sendLicenseInfo() {
-        List<License> licenses = licenseRepository.findAllByEndDateAfter(
+        log.info("sendLicenseInfo");
+        List<License> licenses = licenseRepository.findAllByEndDateBefore(
                 new Date(
                         new java.util.Date().getTime() + daysToExpire * 24 * 60 * 60 * 1000
                 ));

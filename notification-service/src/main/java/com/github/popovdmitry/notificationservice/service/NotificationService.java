@@ -20,12 +20,17 @@ public class NotificationService {
     private final NotifyRepository notifyRepository;
     private final Map<Long, Notification> notificationMap = new HashMap<>();
 
-    public Long saveLicenseInfo(LicenseInfoDTO licenseInfoDTO) {
+    private long notificationId = -1;
+
+
+    public long saveLicenseInfo(LicenseInfoDTO licenseInfoDTO) {
+        notificationId++;
         Notification notification = new Notification();
+        notification.setId(notificationId);
         notification.setProductName(licenseInfoDTO.getProductName());
         notification.setEndDate(licenseInfoDTO.getEndDate());
         notificationMap.put(notification.getId(), notification);
-        return notification.getId();
+        return notificationId;
     }
 
     public void saveUserInfo(String id, UserInfoDTO userInfoDTO) {
@@ -35,8 +40,10 @@ public class NotificationService {
         notificationMap.put(Long.parseLong(id), notification);
     }
 
-    @Scheduled(cron = "0 0 4 * * ?")
+    @Scheduled(cron = "0 48 17 * * ?")
     private void saveNotifications() {
+        log.info("saveNotifications");
+        notificationId = -1;
         notifyRepository.deleteAll();
         notificationMap.forEach((k, v) -> notifyRepository.save(v));
     }

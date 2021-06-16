@@ -2,7 +2,6 @@ package com.github.popovdmitry.notificationservice.listener;
 
 import com.github.popovdmitry.notificationservice.dto.LicenseInfoDTO;
 import com.github.popovdmitry.notificationservice.dto.UserInfoDTO;
-import com.github.popovdmitry.notificationservice.model.Notification;
 import com.github.popovdmitry.notificationservice.service.NotificationService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -21,10 +20,13 @@ public class MessageListener {
 
     @KafkaListener(topics = "licensesInfoTopic", groupId = "licensesInfo", containerFactory = "licenseInfoListener")
     void kafkaLicenseListener(ConsumerRecord<String, LicenseInfoDTO> consumerRecord) {
-        kafkaTemplate.send("usersTopic", notificationService.saveLicenseInfo(consumerRecord.value()).toString(), consumerRecord.key());
+        kafkaTemplate.send(
+                "usersTopic",
+                notificationService.saveLicenseInfo(consumerRecord.value()) + "",
+                consumerRecord.key());
     }
 
-    @KafkaListener(topics = "usersInfoTopic", groupId = "usersInfo", containerFactory = "usersInfoListener")
+    @KafkaListener(topics = "usersInfoTopic", groupId = "usersInfo", containerFactory = "userInfoListener")
     void kafkaUsersListener(ConsumerRecord<String, UserInfoDTO> consumerRecord) {
         notificationService.saveUserInfo(consumerRecord.key(), consumerRecord.value());
     }

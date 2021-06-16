@@ -20,7 +20,7 @@ public class MessageListener {
     private final UserService userService;
 
     @KafkaListener(topics = "usersTopic", groupId = "userId", containerFactory = "userIdListener")
-    void kafkaUsersListener(ConsumerRecord<String, String> consumerRecord) {
+    void kafkaUserIdListener(ConsumerRecord<String, String> consumerRecord) {
         try {
             User user = userService.findUser(Long.parseLong(consumerRecord.value()));
             kafkaTemplate.send("usersInfoTopic", consumerRecord.key(),
