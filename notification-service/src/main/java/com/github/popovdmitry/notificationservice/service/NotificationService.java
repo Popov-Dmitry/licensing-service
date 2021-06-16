@@ -18,6 +18,7 @@ import java.util.Map;
 public class NotificationService {
 
     private final NotifyRepository notifyRepository;
+    private final EmailService emailService;
     private final Map<Long, Notification> notificationMap = new HashMap<>();
 
     private long notificationId = -1;
@@ -40,12 +41,16 @@ public class NotificationService {
         notificationMap.put(Long.parseLong(id), notification);
     }
 
-    @Scheduled(cron = "0 48 17 * * ?")
-    private void saveNotifications() {
+    @Scheduled(cron = "0 26 21 * * ?")
+    private void saveAndSendNotifications() {
         log.info("saveNotifications");
         notificationId = -1;
         notifyRepository.deleteAll();
-        notificationMap.forEach((k, v) -> notifyRepository.save(v));
+        notificationMap.forEach((k, v) -> {
+            notifyRepository.save(v);
+            emailService.sendEmail(v);
+        });
+        notificationMap.clear();
     }
 
 }
