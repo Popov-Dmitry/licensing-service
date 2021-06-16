@@ -1,5 +1,6 @@
 package com.github.popovdmitry.licenseservice.service;
 
+import com.github.popovdmitry.licenseservice.dto.KafkaLicenseInfoDTO;
 import com.github.popovdmitry.licenseservice.dto.LicenseDTO;
 import com.github.popovdmitry.licenseservice.dto.NewLicenseDTO;
 import com.github.popovdmitry.licenseservice.dto.ReturningLicenseDTO;
@@ -11,6 +12,8 @@ import javassist.NotFoundException;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.kafka.core.KafkaTemplate;
+import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Service;
 
 import javax.crypto.BadPaddingException;
@@ -32,9 +35,13 @@ public class LicenseService {
 
     private final LicenseRepository licenseRepository;
     private final ProductService productService;
+    private final KafkaTemplate<String, KafkaLicenseInfoDTO> kafkaTemplate;
 
-    @Value("${license.duration}")
+    @Value("${license.duration-millis}")
     private long licenseDuration;
+
+    @Value("${license.days-to-expire}")
+    private long daysToExpire;
 
     public ReturningLicenseDTO newLicense(NewLicenseDTO newLicenseDTO) throws NotFoundException, NoSuchAlgorithmException, NoSuchPaddingException, IllegalBlockSizeException, BadPaddingException, InvalidKeyException {
         Optional<Product> product = productService.getProduct(newLicenseDTO.getProductName());
@@ -93,6 +100,21 @@ public class LicenseService {
             }
         }
         throw new NotFoundException("License is not found");
+    }
+
+
+    @Scheduled(cron = "0 0 2 * * ?")
+    private void sendLicenseInfo() {
+        List<License> licenses = licenseRepository.findAllByEndDateAfter(
+                new Date(
+                        new java.util.Date().getTime() + daysToExpire * 24 * 60 * 60 * 1000
+                ));
+
+        licenses.forEach(license -> kafkaTemplate.send(
+                "licensesInfoTopic", license.getUserId().toString(), new KafkaLicenseInfoDTO(
+                        license.getProduct().getName(), license.getEndDate()
+                )));
+
     }
 
 }
