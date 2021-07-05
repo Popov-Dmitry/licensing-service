@@ -4,20 +4,26 @@ import com.github.popovdmitry.userservice.dto.KafkaUserInfoDTO;
 import com.github.popovdmitry.userservice.model.User;
 import com.github.popovdmitry.userservice.service.UserService;
 import javassist.NotFoundException;
-import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.kafka.clients.consumer.ConsumerRecord;
+import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.kafka.annotation.KafkaListener;
 import org.springframework.kafka.core.KafkaTemplate;
 import org.springframework.stereotype.Component;
 
 @Component
-@RequiredArgsConstructor
 @Slf4j
 public class MessageListener {
 
-    private final KafkaTemplate<String, KafkaUserInfoDTO> kafkaTemplate;
+
+    private final KafkaTemplate<String, Object> kafkaTemplate;
     private final UserService userService;
+
+    public MessageListener(@Qualifier("defaultKafkaTemplate") KafkaTemplate<String, Object> kafkaTemplate,
+                           UserService userService) {
+        this.kafkaTemplate = kafkaTemplate;
+        this.userService = userService;
+    }
 
     @KafkaListener(topics = "usersTopic", groupId = "userId", containerFactory = "userIdListener")
     void kafkaUserIdListener(ConsumerRecord<String, String> consumerRecord) {

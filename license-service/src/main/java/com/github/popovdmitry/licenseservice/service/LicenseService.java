@@ -9,8 +9,8 @@ import com.github.popovdmitry.licenseservice.model.License;
 import com.github.popovdmitry.licenseservice.model.Product;
 import com.github.popovdmitry.licenseservice.repository.LicenseRepository;
 import javassist.NotFoundException;
-import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.kafka.core.KafkaTemplate;
 import org.springframework.scheduling.annotation.Scheduled;
@@ -29,19 +29,25 @@ import java.util.List;
 import java.util.Optional;
 
 @Service
-@RequiredArgsConstructor
 @Slf4j
 public class LicenseService {
 
     private final LicenseRepository licenseRepository;
     private final ProductService productService;
-    private final KafkaTemplate<String, KafkaLicenseInfoDTO> kafkaTemplate;
+    private final KafkaTemplate<String, Object> kafkaTemplate;
 
     @Value("${license.duration-millis}")
     private long licenseDuration;
 
     @Value("${license.days-to-expire}")
     private long daysToExpire;
+
+    public LicenseService(LicenseRepository licenseRepository, ProductService productService,
+                          @Qualifier("defaultKafkaTemplate") KafkaTemplate<String, Object> kafkaTemplate) {
+        this.licenseRepository = licenseRepository;
+        this.productService = productService;
+        this.kafkaTemplate = kafkaTemplate;
+    }
 
     public ReturningLicenseDTO newLicense(NewLicenseDTO newLicenseDTO) throws NotFoundException, NoSuchAlgorithmException, NoSuchPaddingException, IllegalBlockSizeException, BadPaddingException, InvalidKeyException {
         Optional<Product> product = productService.getProduct(newLicenseDTO.getProductName());
@@ -103,7 +109,7 @@ public class LicenseService {
     }
 
 
-    @Scheduled(cron = "0 46 17 * * ?")
+    @Scheduled(cron = "0 27 22 * * ?")
     private void sendLicenseInfo() {
         log.info("sendLicenseInfo");
         List<License> licenses = licenseRepository.findAllByEndDateBefore(
