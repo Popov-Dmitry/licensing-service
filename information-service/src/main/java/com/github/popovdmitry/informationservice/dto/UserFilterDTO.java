@@ -10,7 +10,7 @@ import lombok.NoArgsConstructor;
 public class UserFilterDTO {
 
     private Long userId;
-    private String userName;
     private int userTypeId;
+    private String userName;
 
 }

@@ -13,6 +13,7 @@ public class LicenseFilterDTO {
 
     private Date licenseStartDate;
     private Date licenseEndDate;
+    private Long userId;
     private Long licenseProductId;
 
 }
