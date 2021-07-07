@@ -1,4 +1,4 @@
-package com.github.popovdmitry.informationservice.dto;
+package com.github.popovdmitry.userservice.dto;
 
 import lombok.AllArgsConstructor;
 import lombok.Data;

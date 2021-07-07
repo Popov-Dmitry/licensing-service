@@ -1,6 +1,8 @@
 package com.github.popovdmitry.userservice.listener;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
 import com.github.popovdmitry.userservice.dto.KafkaUserInfoDTO;
+import com.github.popovdmitry.userservice.dto.UserFilterDTO;
 import com.github.popovdmitry.userservice.model.User;
 import com.github.popovdmitry.userservice.service.UserService;
 import javassist.NotFoundException;
@@ -9,7 +11,9 @@ import org.apache.kafka.clients.consumer.ConsumerRecord;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.kafka.annotation.KafkaListener;
 import org.springframework.kafka.core.KafkaTemplate;
+import org.springframework.messaging.handler.annotation.SendTo;
 import org.springframework.stereotype.Component;
+
 
 @Component
 @Slf4j
@@ -34,5 +38,17 @@ public class MessageListener {
         } catch (NotFoundException exception) {
             exception.printStackTrace();
         }
+    }
+
+    @KafkaListener(topics = "request-user-info-topic")
+    @SendTo
+    public Object listen(ConsumerRecord<String, Object> request) {
+        ObjectMapper objectMapper = new ObjectMapper();
+        UserFilterDTO userFilterDTO = objectMapper.convertValue(request.value(), UserFilterDTO.class);
+
+        if (new String(request.headers().headers("count").iterator().next().value()).equals("true")) {
+            return userService.findAllByFilter(userFilterDTO).size();
+        }
+        return userService.findAllByFilter(userFilterDTO).toArray();
     }
 }
