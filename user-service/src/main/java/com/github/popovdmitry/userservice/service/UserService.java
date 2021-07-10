@@ -50,49 +50,66 @@ public class UserService {
         throw new NotFoundException(String.format("User with id %d is not found", id));
     }
 
-    public List<User> findAllByFilter(UserFilterDTO userFilterDTO) {
+    public List<UserFilterDTO> findAllByFilter(UserFilterDTO userFilterDTO) {
         if (userFilterDTO.getUserId() == null) {
             if (userFilterDTO.getUserTypeId() == null) {
                 if (userFilterDTO.getUserName() == null || userFilterDTO.getUserName().isEmpty()) {
                     return new ArrayList<>();
                 }
                 else {
-                    return userRepository.findAllByName(userFilterDTO.getUserName());
+                    return toUserFilterDTOList(
+                            userRepository.findAllByName(userFilterDTO.getUserName()));
                 }
             }
             else {
                 if (userFilterDTO.getUserName() == null || userFilterDTO.getUserName().isEmpty()) {
-                    return userRepository.findAllByUserType(UserType.values()[userFilterDTO.getUserTypeId()]);
+                    return toUserFilterDTOList(
+                            userRepository.findAllByUserType(UserType.values()[userFilterDTO.getUserTypeId()]));
                 }
                 else {
-                    return userRepository.findAllByUserTypeAndName(
-                            UserType.values()[userFilterDTO.getUserTypeId()],
-                            userFilterDTO.getUserName());
+                    return toUserFilterDTOList(
+                            userRepository.findAllByUserTypeAndName(
+                                    UserType.values()[userFilterDTO.getUserTypeId()],
+                                    userFilterDTO.getUserName()));
                 }
             }
         }
         else {
             if (userFilterDTO.getUserTypeId() == null) {
                 if (userFilterDTO.getUserName() == null || userFilterDTO.getUserName().isEmpty()) {
-                    return userRepository.findAllById(userFilterDTO.getUserId());
+                    return toUserFilterDTOList(
+                            userRepository.findAllById(userFilterDTO.getUserId()));
                 }
                 else {
-                    return userRepository.findAllByIdAndName(userFilterDTO.getUserId(), userFilterDTO.getUserName());
+                    return toUserFilterDTOList(
+                            userRepository.findAllByIdAndName(
+                                    userFilterDTO.getUserId(),
+                                    userFilterDTO.getUserName()));
                 }
             }
             else {
                 if (userFilterDTO.getUserName() == null || userFilterDTO.getUserName().isEmpty()) {
-                    return userRepository.findAllByIdAndUserType(
-                            userFilterDTO.getUserId(),
-                            UserType.values()[userFilterDTO.getUserTypeId()]);
+                    return toUserFilterDTOList(
+                            userRepository.findAllByIdAndUserType(
+                                    userFilterDTO.getUserId(),
+                                    UserType.values()[userFilterDTO.getUserTypeId()]));
                 }
                 else {
-                    return userRepository.findAllByIdAndUserTypeAndName(
-                            userFilterDTO.getUserId(),
-                            UserType.values()[userFilterDTO.getUserTypeId()],
-                            userFilterDTO.getUserName());
+                    return toUserFilterDTOList(
+                            userRepository.findAllByIdAndUserTypeAndName(
+                                    userFilterDTO.getUserId(),
+                                    UserType.values()[userFilterDTO.getUserTypeId()],
+                                    userFilterDTO.getUserName()));
                 }
             }
         }
+    }
+
+    private List<UserFilterDTO> toUserFilterDTOList(List<User> userList) {
+        return userList.stream().map(user -> new UserFilterDTO(
+                user.getId(),
+                user.getUserType().ordinal(),
+                user.getName()
+        )).toList();
     }
 }
