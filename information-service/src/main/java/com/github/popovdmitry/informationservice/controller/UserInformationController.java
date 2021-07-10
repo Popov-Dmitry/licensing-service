@@ -1,6 +1,5 @@
 package com.github.popovdmitry.informationservice.controller;
 
-import com.github.popovdmitry.informationservice.dto.LicenseFilterDTO;
 import com.github.popovdmitry.informationservice.dto.UserFilterDTO;
 import com.github.popovdmitry.informationservice.service.InformationService;
 import lombok.RequiredArgsConstructor;

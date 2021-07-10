@@ -1,12 +1,8 @@
 package com.github.popovdmitry.informationservice.service;
 
-import com.fasterxml.jackson.databind.JavaType;
-import com.fasterxml.jackson.databind.ObjectMapper;
-import com.github.popovdmitry.informationservice.dto.FilterDTO;
 import com.github.popovdmitry.informationservice.dto.LicenseFilterDTO;
 import com.github.popovdmitry.informationservice.dto.UserFilterDTO;
 import lombok.RequiredArgsConstructor;
-import org.apache.kafka.clients.consumer.ConsumerRecord;
 import org.apache.kafka.clients.producer.ProducerRecord;
 import org.apache.kafka.common.header.internals.RecordHeader;
 import org.springframework.kafka.requestreply.ReplyingKafkaTemplate;
