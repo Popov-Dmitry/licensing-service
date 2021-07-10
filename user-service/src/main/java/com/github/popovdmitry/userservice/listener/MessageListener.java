@@ -1,23 +1,33 @@
 package com.github.popovdmitry.userservice.listener;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
 import com.github.popovdmitry.userservice.dto.KafkaUserInfoDTO;
+import com.github.popovdmitry.userservice.dto.UserFilterDTO;
 import com.github.popovdmitry.userservice.model.User;
 import com.github.popovdmitry.userservice.service.UserService;
 import javassist.NotFoundException;
-import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.kafka.clients.consumer.ConsumerRecord;
+import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.kafka.annotation.KafkaListener;
 import org.springframework.kafka.core.KafkaTemplate;
+import org.springframework.messaging.handler.annotation.SendTo;
 import org.springframework.stereotype.Component;
 
+
 @Component
-@RequiredArgsConstructor
 @Slf4j
 public class MessageListener {
 
-    private final KafkaTemplate<String, KafkaUserInfoDTO> kafkaTemplate;
+
+    private final KafkaTemplate<String, Object> kafkaTemplate;
     private final UserService userService;
+
+    public MessageListener(@Qualifier("defaultKafkaTemplate") KafkaTemplate<String, Object> kafkaTemplate,
+                           UserService userService) {
+        this.kafkaTemplate = kafkaTemplate;
+        this.userService = userService;
+    }
 
     @KafkaListener(topics = "usersTopic", groupId = "userId", containerFactory = "userIdListener")
     void kafkaUserIdListener(ConsumerRecord<String, String> consumerRecord) {
@@ -28,5 +38,17 @@ public class MessageListener {
         } catch (NotFoundException exception) {
             exception.printStackTrace();
         }
+    }
+
+    @KafkaListener(topics = "request-user-info-topic")
+    @SendTo
+    public Object listen(ConsumerRecord<String, Object> request) {
+        ObjectMapper objectMapper = new ObjectMapper();
+        UserFilterDTO userFilterDTO = objectMapper.convertValue(request.value(), UserFilterDTO.class);
+
+        if (new String(request.headers().headers("count").iterator().next().value()).equals("true")) {
+            return userService.findAllByFilter(userFilterDTO).size();
+        }
+        return userService.findAllByFilter(userFilterDTO).toArray();
     }
 }
