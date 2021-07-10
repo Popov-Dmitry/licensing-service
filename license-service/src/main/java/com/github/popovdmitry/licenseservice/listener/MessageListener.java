@@ -21,12 +21,12 @@ public class MessageListener {
     @SendTo
     public Object listen(ConsumerRecord<String, Object> request) {
         ObjectMapper objectMapper = new ObjectMapper();
-        LicenseFilterDTO userFilterDTO = objectMapper.convertValue(request.value(), LicenseFilterDTO.class);
+        LicenseFilterDTO licenseFilterDTO = objectMapper.convertValue(request.value(), LicenseFilterDTO.class);
 
         if (new String(request.headers().headers("count").iterator().next().value()).equals("true")) {
-            return licenseService.findAllByFilter(userFilterDTO).size();
+            return licenseService.findAllByFilter(licenseFilterDTO).size();
         }
-        return licenseService.findAllByFilter(userFilterDTO).toArray();
+        return licenseService.findAllByFilter(licenseFilterDTO).toArray();
     }
 
 }

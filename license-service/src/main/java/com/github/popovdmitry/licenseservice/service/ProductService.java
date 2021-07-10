@@ -18,4 +18,8 @@ public class ProductService {
     public Optional<Product> getProduct(String name) {
         return productRepository.findByName(name);
     }
+
+    public Optional<Product> getProduct(Long id) {
+        return productRepository.findById(id);
+    }
 }

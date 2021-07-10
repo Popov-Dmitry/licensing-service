@@ -1,9 +1,6 @@
 package com.github.popovdmitry.licenseservice.service;
 
-import com.github.popovdmitry.licenseservice.dto.KafkaLicenseInfoDTO;
-import com.github.popovdmitry.licenseservice.dto.LicenseDTO;
-import com.github.popovdmitry.licenseservice.dto.NewLicenseDTO;
-import com.github.popovdmitry.licenseservice.dto.ReturningLicenseDTO;
+import com.github.popovdmitry.licenseservice.dto.*;
 import com.github.popovdmitry.licenseservice.exception.LicenseExpiredException;
 import com.github.popovdmitry.licenseservice.model.License;
 import com.github.popovdmitry.licenseservice.model.Product;
@@ -25,6 +22,8 @@ import java.security.InvalidKeyException;
 import java.security.KeyPairGenerator;
 import java.security.NoSuchAlgorithmException;
 import java.sql.Date;
+import java.util.ArrayList;
+import java.util.Collection;
 import java.util.List;
 import java.util.Optional;
 
@@ -124,4 +123,162 @@ public class LicenseService {
 
     }
 
+    public List<ReturningLicenseFilterDTO> findAllByFilter(LicenseFilterDTO licenseFilterDTO) {
+        if (licenseFilterDTO.getLicenseStartDate() == null) {
+            if (licenseFilterDTO.getLicenseEndDate() == null) {
+                if (licenseFilterDTO.getLicenseProductId() == null) {
+                    if (licenseFilterDTO.getUserId() == null) {
+                        return new ArrayList<>();
+                    }
+                    else {
+                        return toReturningLicenseFilterDTOList(
+                                licenseRepository.findAllByUserId(licenseFilterDTO.getUserId()));
+                    }
+                }
+                else {
+                    Optional<Product> product = productService.getProduct(licenseFilterDTO.getLicenseProductId());
+                    if (licenseFilterDTO.getUserId() == null) {
+                        if (product.isPresent()) {
+                            return toReturningLicenseFilterDTOList(
+                                    licenseRepository.findAllByProduct(product.get()));
+                        }
+                        return new ArrayList<>();
+                    }
+                    else {
+                        if (product.isPresent()) {
+                            return toReturningLicenseFilterDTOList(
+                                    licenseRepository.findAllByUserIdAndProduct(
+                                            licenseFilterDTO.getUserId(),
+                                            product.get()));
+                        }
+                        return new ArrayList<>();
+                    }
+                }
+            }
+            else {
+                if (licenseFilterDTO.getLicenseProductId() == null) {
+                    if (licenseFilterDTO.getUserId() == null) {
+                        return toReturningLicenseFilterDTOList(
+                                licenseRepository.findAllByEndDate(licenseFilterDTO.getLicenseEndDate()));
+                    }
+                    else {
+                        return toReturningLicenseFilterDTOList(
+                                licenseRepository.findAllByUserIdAndEndDate(
+                                        licenseFilterDTO.getUserId(),
+                                        licenseFilterDTO.getLicenseEndDate()));
+                    }
+                }
+                else {
+                    Optional<Product> product = productService.getProduct(licenseFilterDTO.getLicenseProductId());
+                    if (licenseFilterDTO.getUserId() == null) {
+                        if (product.isPresent()) {
+                            return toReturningLicenseFilterDTOList(
+                                    licenseRepository.findAllByEndDateAndProduct(
+                                            licenseFilterDTO.getLicenseEndDate(),
+                                            product.get()));
+                        }
+                        return new ArrayList<>();
+                    }
+                    else {
+                        if (product.isPresent()) {
+                            return toReturningLicenseFilterDTOList(
+                                    licenseRepository.findAllByUserIdAndEndDateAndProduct(
+                                            licenseFilterDTO.getUserId(),
+                                            licenseFilterDTO.getLicenseEndDate(),
+                                            product.get()));
+                        }
+                        return new ArrayList<>();
+                    }
+                }
+            }
+        }
+        else {
+            if (licenseFilterDTO.getLicenseEndDate() == null) {
+                if (licenseFilterDTO.getLicenseProductId() == null) {
+                    if (licenseFilterDTO.getUserId() == null) {
+                        return toReturningLicenseFilterDTOList(
+                                licenseRepository.findAllByStartDate(licenseFilterDTO.getLicenseStartDate()));
+                    }
+                    else {
+                        return toReturningLicenseFilterDTOList(
+                                licenseRepository.findAllByUserIdAndStartDate(
+                                        licenseFilterDTO.getUserId(),
+                                        licenseFilterDTO.getLicenseStartDate()));
+                    }
+                }
+                else {
+                    Optional<Product> product = productService.getProduct(licenseFilterDTO.getLicenseProductId());
+                    if (licenseFilterDTO.getUserId() == null) {
+                        if (product.isPresent()) {
+                            return toReturningLicenseFilterDTOList(
+                                    licenseRepository.findAllByStartDateAndProduct(
+                                            licenseFilterDTO.getLicenseStartDate(),
+                                            product.get()));
+                        }
+                        return new ArrayList<>();
+                    }
+                    else {
+                        if (product.isPresent()) {
+                            return toReturningLicenseFilterDTOList(
+                                    licenseRepository.findAllByUserIdAndStartDateAndProduct(
+                                            licenseFilterDTO.getUserId(),
+                                            licenseFilterDTO.getLicenseStartDate(),
+                                            product.get()));
+                        }
+                        return new ArrayList<>();
+                    }
+                }
+            }
+            else {
+                if (licenseFilterDTO.getLicenseProductId() == null) {
+                    if (licenseFilterDTO.getUserId() == null) {
+                        return toReturningLicenseFilterDTOList(
+                                licenseRepository.findAllByStartDateAndEndDate(
+                                        licenseFilterDTO.getLicenseStartDate(),
+                                        licenseFilterDTO.getLicenseEndDate()));
+                    }
+                    else {
+                        return toReturningLicenseFilterDTOList(
+                                licenseRepository.findAllByUserIdAndStartDateAndEndDate(
+                                        licenseFilterDTO.getUserId(),
+                                        licenseFilterDTO.getLicenseStartDate(),
+                                        licenseFilterDTO.getLicenseEndDate()));
+                    }
+                }
+                else {
+                    Optional<Product> product = productService.getProduct(licenseFilterDTO.getLicenseProductId());
+                    if (licenseFilterDTO.getUserId() == null) {
+                        if (product.isPresent()) {
+                            return toReturningLicenseFilterDTOList(
+                                    licenseRepository.findAllByStartDateAndEndDateAndProduct(
+                                            licenseFilterDTO.getLicenseStartDate(),
+                                            licenseFilterDTO.getLicenseEndDate(),
+                                            product.get()));
+                        }
+                        return new ArrayList<>();
+                    }
+                    else {
+                        if (product.isPresent()) {
+                            return toReturningLicenseFilterDTOList(
+                                    licenseRepository.findAllByUserIdAndStartDateAndEndDateAndProduct(
+                                            licenseFilterDTO.getUserId(),
+                                            licenseFilterDTO.getLicenseStartDate(),
+                                            licenseFilterDTO.getLicenseEndDate(),
+                                            product.get()));
+                        }
+                        return new ArrayList<>();
+                    }
+                }
+            }
+        }
+    }
+
+    private List<ReturningLicenseFilterDTO> toReturningLicenseFilterDTOList(List<License> licenseList) {
+        return licenseList.stream().map(license -> new ReturningLicenseFilterDTO(
+                license.getStartDate().toString(),
+                license.getEndDate().toString(),
+                license.getUserId(),
+                license.getProduct().getId()
+        )).toList();
+    }
 }
