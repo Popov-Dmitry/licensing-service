@@ -40,6 +40,9 @@ public class LicenseService {
     @Value("${license.days-to-expire}")
     private long daysToExpire;
 
+    @Value("${kafka.topic.cron.licensesInfoTopic}")
+    private String licensesInfoTopic;
+
     public LicenseService(LicenseRepository licenseRepository, ProductService productService,
                           @Qualifier("defaultKafkaTemplate") KafkaTemplate<String, Object> kafkaTemplate) {
         this.licenseRepository = licenseRepository;
@@ -107,7 +110,7 @@ public class LicenseService {
     }
 
 
-    @Scheduled(cron = "0 27 22 * * ?")
+    @Scheduled(cron = "${cron.send-license-info}")
     private void sendLicenseInfo() {
         log.info("sendLicenseInfo");
         List<License> licenses = licenseRepository.findAllByEndDateBefore(
@@ -116,7 +119,7 @@ public class LicenseService {
                 ));
 
         licenses.forEach(license -> kafkaTemplate.send(
-                "licensesInfoTopic", license.getUserId().toString(), new KafkaLicenseInfoDTO(
+                licensesInfoTopic, license.getUserId().toString(), new KafkaLicenseInfoDTO(
                         license.getProduct().getName(), license.getEndDate()
                 )));
 

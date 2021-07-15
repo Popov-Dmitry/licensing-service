@@ -5,6 +5,7 @@ import org.apache.kafka.clients.consumer.ConsumerConfig;
 import org.apache.kafka.clients.producer.ProducerConfig;
 import org.apache.kafka.common.serialization.StringDeserializer;
 import org.apache.kafka.common.serialization.StringSerializer;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.kafka.config.ConcurrentKafkaListenerContainerFactory;
@@ -26,8 +27,17 @@ import java.util.UUID;
 @Configuration
 public class KafkaConfig {
 
-    private final String bootstrapServers = "localhost:9092";
-    private final String requestReplyTopic = "requestreply-topic";
+    @Value("${kafka.bootstrap-servers}")
+    private String bootstrapServers;
+
+    @Value("${kafka.topic.requestreply-topic}")
+    private String requestReplyTopic;
+
+    @Value("${kafka.consumer-group.reply}")
+    private String consumerGroupReply;
+
+    @Value("${kafka.consumer-group.userId}")
+    private String consumerGroupUserId;
 
     @Bean
     public Map<String, Object> producerConfigs() {
@@ -44,7 +54,7 @@ public class KafkaConfig {
     public Map<String, Object> consumerConfigs() {
         Map<String, Object> props = new HashMap<>();
         props.put(ConsumerConfig.BOOTSTRAP_SERVERS_CONFIG,bootstrapServers);
-        props.put(ConsumerConfig.GROUP_ID_CONFIG, "information-group");
+        props.put(ConsumerConfig.GROUP_ID_CONFIG, consumerGroupReply);
         return props;
     }
 
@@ -103,7 +113,7 @@ public class KafkaConfig {
     public ConsumerFactory<String, String> consumerFactoryUserId(){
         Map<String,Object> config = new HashMap<>();
         config.put(ConsumerConfig.BOOTSTRAP_SERVERS_CONFIG, bootstrapServers);
-        config.put(ConsumerConfig.GROUP_ID_CONFIG,"userId");
+        config.put(ConsumerConfig.GROUP_ID_CONFIG, consumerGroupUserId);
         return new DefaultKafkaConsumerFactory<>(config, new StringDeserializer(), new JsonDeserializer<String>(String.class, false));
     }
 

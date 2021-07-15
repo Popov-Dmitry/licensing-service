@@ -18,15 +18,17 @@ public class MessageListener {
     private final KafkaTemplate<String, String> kafkaTemplate;
     private final NotificationService notificationService;
 
-    @KafkaListener(topics = "licensesInfoTopic", groupId = "licensesInfo", containerFactory = "licenseInfoListener")
+    @KafkaListener(topics = "${kafka.topic.licensesInfoTopic}",
+            groupId = "${kafka.consumer-group.license}", containerFactory = "licenseInfoListener")
     void kafkaLicenseListener(ConsumerRecord<String, LicenseInfoDTO> consumerRecord) {
         kafkaTemplate.send(
-                "usersTopic",
+                "${kafka.topic.usersTopic}",
                 notificationService.saveLicenseInfo(consumerRecord.value()) + "",
                 consumerRecord.key());
     }
 
-    @KafkaListener(topics = "usersInfoTopic", groupId = "usersInfo", containerFactory = "userInfoListener")
+    @KafkaListener(topics = "${kafka.topic.usersInfoTopic}",
+            groupId = "${kafka.consumer-group.user}", containerFactory = "userInfoListener")
     void kafkaUsersListener(ConsumerRecord<String, UserInfoDTO> consumerRecord) {
         notificationService.saveUserInfo(consumerRecord.key(), consumerRecord.value());
     }

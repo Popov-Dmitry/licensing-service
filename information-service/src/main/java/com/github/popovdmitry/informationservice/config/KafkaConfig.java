@@ -5,6 +5,7 @@ import org.apache.kafka.clients.consumer.ConsumerConfig;
 import org.apache.kafka.clients.producer.ProducerConfig;
 import org.apache.kafka.common.serialization.StringDeserializer;
 import org.apache.kafka.common.serialization.StringSerializer;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.kafka.config.ConcurrentKafkaListenerContainerFactory;
@@ -23,8 +24,14 @@ import java.util.*;
 @Configuration
 public class KafkaConfig {
 
-    private final String bootstrapServers = "localhost:9092";
-    private final String requestReplyTopic = "requestreply-topic";
+    @Value("${kafka.bootstrap-servers}")
+    private String bootstrapServers;
+
+    @Value("${kafka.topic.requestreply-topic}")
+    private String requestReplyTopic;
+
+    @Value("${kafka.consumer-group}")
+    private String consumerGroup;
 
     @Bean
     public Map<String, Object> producerConfigs() {
@@ -41,7 +48,7 @@ public class KafkaConfig {
     public Map<String, Object> consumerConfigs() {
         Map<String, Object> props = new HashMap<>();
         props.put(ConsumerConfig.BOOTSTRAP_SERVERS_CONFIG,bootstrapServers);
-        props.put(ConsumerConfig.GROUP_ID_CONFIG, "information-group");
+        props.put(ConsumerConfig.GROUP_ID_CONFIG, consumerGroup);
         return props;
     }
 

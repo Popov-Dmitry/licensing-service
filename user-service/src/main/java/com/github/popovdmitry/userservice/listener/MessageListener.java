@@ -29,18 +29,19 @@ public class MessageListener {
         this.userService = userService;
     }
 
-    @KafkaListener(topics = "usersTopic", groupId = "userId", containerFactory = "userIdListener")
+    @KafkaListener(topics = "${kafka.topic.usersTopic}",
+            groupId = "${kafka.consumer-group.userId}", containerFactory = "userIdListener")
     void kafkaUserIdListener(ConsumerRecord<String, String> consumerRecord) {
         try {
             User user = userService.findUser(Long.parseLong(consumerRecord.value()));
-            kafkaTemplate.send("usersInfoTopic", consumerRecord.key(),
+            kafkaTemplate.send("${kafka.topic.usersInfoTopic}", consumerRecord.key(),
                     new KafkaUserInfoDTO(user.getEmails().get(0).getEmail(), user.getName()));
         } catch (NotFoundException exception) {
             exception.printStackTrace();
         }
     }
 
-    @KafkaListener(topics = "request-user-info-topic")
+    @KafkaListener(topics = "${kafka.topic.request-user-info-topic}")
     @SendTo
     public Object listen(ConsumerRecord<String, Object> request) {
         ObjectMapper objectMapper = new ObjectMapper();

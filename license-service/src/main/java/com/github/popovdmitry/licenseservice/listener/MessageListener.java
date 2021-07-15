@@ -17,7 +17,7 @@ public class MessageListener {
 
     private final LicenseService licenseService;
 
-    @KafkaListener(topics = "request-license-info-topic")
+    @KafkaListener(topics = "${kafka.topic.request-license-info-topic}")
     @SendTo
     public Object listen(ConsumerRecord<String, Object> request) {
         ObjectMapper objectMapper = new ObjectMapper();
