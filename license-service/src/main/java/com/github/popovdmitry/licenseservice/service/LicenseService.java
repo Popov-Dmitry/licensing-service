@@ -45,7 +45,6 @@ public class LicenseService {
         this.licenseRepository = licenseRepository;
         this.productService = productService;
         this.kafkaTemplate = kafkaTemplate;
-        System.out.println(daysToExpire);
     }
 
     public ReturningLicenseDTO newLicense(NewLicenseDTO newLicenseDTO) throws NotFoundException, NoSuchAlgorithmException, NoSuchPaddingException, IllegalBlockSizeException, BadPaddingException, InvalidKeyException {
