@@ -3,6 +3,7 @@ package com.github.popovdmitry.informationservice.service;
 import com.github.popovdmitry.informationservice.dto.LicenseFilterDTO;
 import com.github.popovdmitry.informationservice.dto.UserFilterDTO;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.apache.kafka.clients.producer.ProducerRecord;
 import org.apache.kafka.common.header.internals.RecordHeader;
 import org.springframework.beans.factory.annotation.Value;
@@ -17,6 +18,7 @@ import java.util.concurrent.ExecutionException;
 
 @Service
 @RequiredArgsConstructor
+@Slf4j
 public class InformationService {
 
     private final ReplyingKafkaTemplate<String, Object, Object> replyingKafkaTemplate;

@@ -6,6 +6,7 @@ import com.github.popovdmitry.notificationservice.service.NotificationService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.kafka.clients.consumer.ConsumerRecord;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.kafka.annotation.KafkaListener;
 import org.springframework.kafka.core.KafkaTemplate;
 import org.springframework.stereotype.Component;
@@ -18,11 +19,14 @@ public class MessageListener {
     private final KafkaTemplate<String, String> kafkaTemplate;
     private final NotificationService notificationService;
 
+    @Value("${kafka.topic.usersTopic}")
+    private String usersTopic;
+
     @KafkaListener(topics = "${kafka.topic.licensesInfoTopic}",
             groupId = "${kafka.consumer-group.license}", containerFactory = "licenseInfoListener")
     void kafkaLicenseListener(ConsumerRecord<String, LicenseInfoDTO> consumerRecord) {
         kafkaTemplate.send(
-                "${kafka.topic.usersTopic}",
+                usersTopic,
                 notificationService.saveLicenseInfo(consumerRecord.value()) + "",
                 consumerRecord.key());
     }
