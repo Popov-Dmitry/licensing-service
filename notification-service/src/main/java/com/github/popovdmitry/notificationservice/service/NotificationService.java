@@ -41,7 +41,7 @@ public class NotificationService {
         notificationMap.put(Long.parseLong(id), notification);
     }
 
-    @Scheduled(cron = "0 28 22 * * ?")
+    @Scheduled(cron = "${cron.save-info}")
     private void saveAndSendNotifications() {
         log.info("saveNotifications");
         notificationId = -1;

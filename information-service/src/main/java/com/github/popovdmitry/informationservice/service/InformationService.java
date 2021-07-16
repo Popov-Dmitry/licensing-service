@@ -3,8 +3,10 @@ package com.github.popovdmitry.informationservice.service;
 import com.github.popovdmitry.informationservice.dto.LicenseFilterDTO;
 import com.github.popovdmitry.informationservice.dto.UserFilterDTO;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.apache.kafka.clients.producer.ProducerRecord;
 import org.apache.kafka.common.header.internals.RecordHeader;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.kafka.requestreply.ReplyingKafkaTemplate;
 import org.springframework.kafka.requestreply.RequestReplyFuture;
 import org.springframework.kafka.support.KafkaHeaders;
@@ -16,13 +18,19 @@ import java.util.concurrent.ExecutionException;
 
 @Service
 @RequiredArgsConstructor
+@Slf4j
 public class InformationService {
 
     private final ReplyingKafkaTemplate<String, Object, Object> replyingKafkaTemplate;
 
-    private final String requestUserInfoTopic = "request-user-info-topic";
-    private final String requestLicenseInfoTopic = "request-license-info-topic";
-    private final String requestReplyTopic = "requestreply-topic";
+    @Value("${kafka.topic.request-user-info-topic}")
+    private String requestUserInfoTopic;
+
+    @Value("${kafka.topic.request-license-info-topic}")
+    private String requestLicenseInfoTopic;
+
+    @Value("${kafka.topic.requestreply-topic}")
+    private String requestReplyTopic;
 
     public Object getLicenseInfo(LicenseFilterDTO licenseFilterDTO, boolean count) throws ExecutionException, InterruptedException {
         ProducerRecord<String, Object> recordLicense = new ProducerRecord<String, Object>(requestLicenseInfoTopic, licenseFilterDTO);
